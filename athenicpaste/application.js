@@ -1,7 +1,9 @@
+'use strict';
+
 let express = require('express');
 
 
-function createApp() {
+function createApplication() {
   let app = express();
 
   app.get('/', function(req, res) {
@@ -11,4 +13,4 @@ function createApp() {
   return app;
 }
 
-exports.createApp = createApp;
+exports.createApplication = createApplication;
