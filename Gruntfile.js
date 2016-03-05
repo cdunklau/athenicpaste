@@ -9,12 +9,10 @@ module.exports = function(grunt) {
           checkAnnotations: 'jsdoc3',
           checkParamExistence: true,
           checkTypes: 'strictNativeCase',
-          enforceExistence: {
-            allExcept: ['exports'],
-          },
+          // Don't enforce yet: enforceExistence: {allExcept: ['exports'],},
         },
       },
-      src: ['lib', 'tests', 'demo', 'Gruntfile.js'],
+      src: ['athenicpaste', 'tests', 'demo', 'Gruntfile.js'],
     },
     jshint: {
       options: {
@@ -30,7 +28,7 @@ module.exports = function(grunt) {
         },
         src: 'tests',
       },
-      lib: {src: 'lib'},
+      athenicpaste: {src: 'athenicpaste'},
       meta: {src: ['package.json', 'Gruntfile.js'],},
     },
     jasmine_nodejs: {  // jscs:ignore requireCamelCaseOrUpperCaseIdentifiers
