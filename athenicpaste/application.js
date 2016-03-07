@@ -10,21 +10,6 @@ let ClientError = require('./errors.js').ClientError;
 const dbUrl = 'mongodb://localhost:27017/athenicpaste';
 
 
-function logErrors(err, request, response, next) {
-  console.error(err.stack);
-  next();
-}
-
-
-function handleClientError(err, request, response, next) {
-  if (err instanceof ClientError) {
-    response.status(err.statusCode).send(err.message);
-  } else {
-    next();
-  }
-}
-
-
 function createApplication() {
   return createDatabaseManager(dbUrl).then(function(dbManager) {
     let app = express();
@@ -36,8 +21,17 @@ function createApplication() {
 
     app.use(router);
 
-    app.use(logErrors);
-    app.use(handleClientError);
+    app.use(function logErrors(err, request, response, next) {
+      console.error(err.stack);
+      next(err);
+    });
+    app.use(function handleClientError(err, request, response, next) {
+      if (err instanceof ClientError) {
+        response.status(err.statusCode).send(err.message);
+      } else {
+        next(err);
+      }
+    });
     return app;
   });
 }
