@@ -3,15 +3,12 @@
 let express = require('express');
 
 let router = require('./router.js');
-let createDatabaseManager = require('./models/dbManager.js');
+let createDatabaseManager = require('./models').createDatabaseManager;
 let ClientError = require('./errors.js').ClientError;
 
 
-const dbUrl = 'mongodb://localhost:27017/athenicpaste';
-
-
-function createApplication() {
-  return createDatabaseManager(dbUrl).then(function(dbManager) {
+function createApplication(config) {
+  return createDatabaseManager(config.dbUrl).then(function(dbManager) {
     let app = express();
 
     app.use(function(request, response, next) {
@@ -21,10 +18,6 @@ function createApplication() {
 
     app.use(router);
 
-    app.use(function logErrors(err, request, response, next) {
-      console.error(err.stack);
-      next(err);
-    });
     app.use(function handleClientError(err, request, response, next) {
       if (err instanceof ClientError) {
         response.status(err.statusCode).send(err.message);
@@ -32,6 +25,12 @@ function createApplication() {
         next(err);
       }
     });
+
+    app.use(function logErrors(err, request, response, next) {
+      console.error(err.stack);
+      next(err);
+    });
+
     return app;
   });
 }

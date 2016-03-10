@@ -1,41 +1,40 @@
 'use strict';
 
 let expressPromiseRouter = require('express-promise-router');
+let bodyParser = require('body-parser');
 
 let pasteModel = require('./models/paste.js');
 let ClientError = require('./errors.js').ClientError;
 
 
-let router = expressPromiseRouter();
+let rootRouter = expressPromiseRouter();
+let apiRouter = expressPromiseRouter();
+
+rootRouter.use('/api', apiRouter);
+rootRouter.use(bodyParser.urlencoded({extended: true}));
+apiRouter.use(bodyParser.json());
 
 
-router.get('/', function(request, response) {
+rootRouter.get('/', function(request, response) {
   response.render('pasteform');
 });
 
-router.get('/paste/:id', function(request, response) {
+rootRouter.get('/paste/:id', function(request, response) {
   return request.db.paste.fetchById(request.params.id).then(function(paste) {
-    if (paste === undefined) {
+    if (paste === null) {
       throw ClientError({
         title: 'could not find paste with ID ' + request.params.id,
         statusCode: 404,
       });
     } else {
-      response.render('paste-display', {paste: paste});
+      // TODO: replace this with a real template
+      let body = `<h1>${paste.name}</h1><pre>${paste.content}</pre>\r\n`;
+      response.send(body);
     }
   });
 });
 
-router.get('/api/pastes', function(request, response) {
-  return request.db.then(function(db) {
-    return db.collection('pastes').find({}).toArray();
-  }).then(function(results) {
-    response.json(results);
-  });
-});
-
-
-router.get('/api/pastes/:id', function(request, response) {
+apiRouter.get('/pastes/:id', function(request, response) {
   return request.db.paste.fetchById(request.params.id).then(function(paste) {
     if (paste === null) {
       throw ClientError({
@@ -48,4 +47,10 @@ router.get('/api/pastes/:id', function(request, response) {
   });
 });
 
-module.exports = router;
+apiRouter.post('/pastes', function(request, response) {
+  return request.db.paste.insertNew(request.body).then(function(pasteId) {
+    response.status(201).json({id: pasteId});
+  });
+});
+
+module.exports = rootRouter;

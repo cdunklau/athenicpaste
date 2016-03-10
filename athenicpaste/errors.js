@@ -11,3 +11,13 @@ let ClientError = TypedError({
 });
 
 exports.ClientError = ClientError;
+
+
+let Invalid = TypedError({
+  type: 'invalid',
+  message: 'Invalid {field} value {value}: {error}',
+  field: null,
+  value: null,
+  error: null,
+});
+exports.Invalid = Invalid;
