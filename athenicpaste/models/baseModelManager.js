@@ -37,7 +37,7 @@ let managerMethods = {
 
   cleanedFields: function(modelInstance) {
     let result = {};
-    _.forOwn(this.fields, function(ignored, field) {
+    _.forOwn(this.validation, function(ignored, field) {
       if (_.has(modelInstance, field)) {
         result[field] = modelInstance[field];
       }
@@ -47,7 +47,7 @@ let managerMethods = {
 
   validatedFields: function(modelInstance) {
     let result = {};
-    _.forOwn(this.fields, function(isValid, field) {
+    _.forOwn(this.validation, function(isValid, field) {
       let value = modelInstance[field];
       if (isValid(value, field)) {
         result[field] = value;
@@ -59,7 +59,7 @@ let managerMethods = {
 
 
 function createManagerFactory(properties) {
-  ['collectionName', 'fields'].forEach(function(requiredField) {
+  ['collectionName', 'validation'].forEach(function(requiredField) {
     if (!_.has(properties, requiredField)) {
       throw new TypeError('properties.' + requiredField + ' is required');
     }

@@ -7,7 +7,7 @@ let createManagerFactory = require('./baseModelManager.js');
 let createManager = createManagerFactory({
   collectionName: 'pastes',
 
-  fields: {
+  validation: {
     name: validators.isString,
     content: validators.isString,
   },
