@@ -28,7 +28,7 @@ function createApplication(config) {
 
     app.use(function logErrors(err, request, response, next) {
       console.error(err.stack);
-      next(err);
+      //next(err);
     });
 
     return app;
