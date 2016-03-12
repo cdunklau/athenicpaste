@@ -15,10 +15,12 @@
     "grunt-jscs": "^2.8.0"
   },
   "dependencies": {
+    "bluebird": "^3.3.4",
     "body-parser": "^1.15.0",
     "error": "^7.0.2",
     "express": "^4.13.4",
     "express-promise-router": "^1.0.0",
+    "joi": "^8.0.4",
     "lodash": "^4.6.1",
     "mongodb": "^2.1.7"
   }

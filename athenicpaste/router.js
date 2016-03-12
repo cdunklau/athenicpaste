@@ -34,6 +34,8 @@ rootRouter.get('/paste/:id', function(request, response) {
   });
 });
 
+
+
 apiRouter.get('/pastes/:id', function(request, response) {
   return request.db.paste.fetchById(request.params.id).then(function(paste) {
     if (paste === null) {

@@ -1,7 +1,11 @@
 'use strict';
 
+let Promise = require('bluebird');
 let ObjectID = require('mongodb').ObjectID;
 let _ = require('lodash');
+let joi = require('joi');
+
+joi.validateAsync = Promise.promisify(joi.validate);
 
 
 let managerMethods = {
@@ -19,49 +23,45 @@ let managerMethods = {
       if (modelInstance === null) {
         return null;
       }
-      return self.cleanedFields(modelInstance);
+      return modelInstance;
     });
   },
 
   insertNew: function(modelInstance) {
     let self = this;
 
-    return Promise.resolve(modelInstance).then(function(modelInstance) {
-      return self.validatedFields(self.cleanedFields(modelInstance));
-    }).then(function doInsert(validatedPasteInstance) {
+    return self.validateInstance(modelInstance).then(
+            function doInsert(validatedPasteInstance) {
       return self.getCollection().insertOne(validatedPasteInstance);
     }).then(function getInsertedIdString(insertResult) {
       return insertResult.insertedId.toHexString();
     });
   },
 
-  cleanedFields: function(modelInstance) {
-    let result = {};
-    _.forOwn(this.validation, function(ignored, field) {
-      if (_.has(modelInstance, field)) {
-        result[field] = modelInstance[field];
-      }
-    });
-    return result;
-  },
-
-  validatedFields: function(modelInstance) {
-    let result = {};
-    _.forOwn(this.validation, function(isValid, field) {
-      let value = modelInstance[field];
-      if (isValid(value, field)) {
-        result[field] = value;
-      }
-    });
-    return result;
+  validateInstance: function(modelInstance) {
+    return joi.validateAsync(modelInstance, this.schema);
   },
 };
 
 
+/**
+ * Return a function that accepts a MongoDB "db" instance and returns a
+ * model manager.
+ *
+ * @param {Object} properties
+ * - The properties of the model manager. There are two required properties.
+ * @param {string} properties.collectionName
+ * - The MongoDB collection where these models will be stored.
+ * @param {Object} properties.schema
+ * - A Joi schema for validating the model fields.
+ *
+ */
 function createManagerFactory(properties) {
-  ['collectionName', 'validation'].forEach(function(requiredField) {
+  ['collectionName', 'schema'].forEach(function(requiredField) {
     if (!_.has(properties, requiredField)) {
-      throw new TypeError('properties.' + requiredField + ' is required');
+      throw new TypeError(
+        `properties.${requiredField} not provided but is required`
+      );
     }
   });
 

@@ -1,16 +1,19 @@
 'use strict';
 
-let validators = require('../validators.js');
+let joi = require('joi');
+
 let createManagerFactory = require('./baseModelManager.js');
+
+
+let pasteSchema = joi.object().keys({
+  name: joi.string().min(1).max(200),
+  content: joi.string().min(1).max(1e6),
+}).requiredKeys(['name', 'content']);
 
 
 let createManager = createManagerFactory({
   collectionName: 'pastes',
-
-  validation: {
-    name: validators.isString,
-    content: validators.isString,
-  },
+  schema: pasteSchema,
 });
 
 exports.createManager = createManager;

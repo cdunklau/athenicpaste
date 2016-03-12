@@ -9,7 +9,6 @@ let ClientError = TypedError({
   title: null,
   statusCode: null,
 });
-
 exports.ClientError = ClientError;
 
 
