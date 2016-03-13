@@ -1,11 +1,11 @@
 'use strict';
 
-let Promise = require('bluebird');
+let BPromise = require('bluebird');
 let ObjectID = require('mongodb').ObjectID;
 let _ = require('lodash');
 let joi = require('joi');
 
-joi.validateAsync = Promise.promisify(joi.validate);
+joi.validateAsync = BPromise.promisify(joi.validate);
 
 
 let managerMethods = {
@@ -16,10 +16,10 @@ let managerMethods = {
   fetchById: function(stringId) {
     let self = this;
 
-    let resultPromise = this.getCollection().find({
+    let resultBPromise = this.getCollection().find({
       _id: ObjectID.createFromHexString(stringId),
     }).limit(1).next();
-    return resultPromise.then(function(modelInstance) {
+    return resultBPromise.then(function(modelInstance) {
       if (modelInstance === null) {
         return null;
       }
@@ -31,8 +31,8 @@ let managerMethods = {
     let self = this;
 
     return self.validateInstance(modelInstance).then(
-            function doInsert(validatedPasteInstance) {
-      return self.getCollection().insertOne(validatedPasteInstance);
+            function doInsert(validatedModelInstance) {
+      return self.getCollection().insertOne(validatedModelInstance);
     }).then(function getInsertedIdString(insertResult) {
       return insertResult.insertedId.toHexString();
     });
