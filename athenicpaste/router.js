@@ -50,7 +50,16 @@ apiRouter.get('/pastes/:id', function(request, response) {
 });
 
 apiRouter.post('/pastes', function(request, response) {
-  return request.db.paste.insertNew(request.body).then(function(pasteId) {
+  return request.db.paste.insertNew(request.body).catch(function(err) {
+    if (err.name === 'ValidationError' && err.isJoi) {
+      throw ClientError({
+        title: 'validation failed: ' + err.details,
+        statusCode: 400,
+      });
+    } else {
+      throw err;
+    }
+  }).then(function(pasteId) {
     response.status(201).json({id: pasteId});
   });
 });
